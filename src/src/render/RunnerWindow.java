@@ -8,6 +8,8 @@ import javax.swing.JScrollPane;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Color;
+import java.awt.Dimension;
+
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -51,7 +53,9 @@ public class RunnerWindow {
 	 */
 	private void initialize() {
 		JTextPane consoleData = new JTextPane();
+		consoleData.setEditable(false);
 		JTextPane consoleAI = new JTextPane();
+		consoleAI.setEditable(false);
 		//String[] speedArr = {"0.1x", "0.25x", "0.5x", "1.0x", "2.0x"};
 		//String[] ruleArr = {"Keep Right", "Keep Left", "Keep Straight", "Random Direction", "Probability from data"};
 		
@@ -82,7 +86,7 @@ public class RunnerWindow {
 		
 		JPanel ctrlPanel = new JPanel();
 		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
-		gbc_panel_1.insets = new Insets(0, 0, 5, 5);
+		gbc_panel_1.insets = new Insets(5, 0, 5, 5);
 		gbc_panel_1.fill = GridBagConstraints.BOTH;
 		gbc_panel_1.gridx = 2;
 		gbc_panel_1.gridy = 0;
@@ -145,6 +149,9 @@ public class RunnerWindow {
 	public static class RenderFrame extends JPanel{
 		public RenderFrame() {
 			setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		}
+		public Dimension getPreferredSize() {
+			return new Dimension(960, 540);
 		}
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
