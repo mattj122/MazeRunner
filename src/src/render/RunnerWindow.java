@@ -20,10 +20,16 @@ import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 public class RunnerWindow {
 
 	private JFrame frmMazerunnerDisplayWindow;
+	public boolean paused = false;
 
 	/**
 	 * Launch the application.
@@ -56,12 +62,17 @@ public class RunnerWindow {
 		consoleData.setEditable(false);
 		JTextPane consoleAI = new JTextPane();
 		consoleAI.setEditable(false);
+		
+		JButton btnStart = new JButton("Start Maze Run");
+		JButton btnPause = new JButton("Pause Maze Run");
+		JButton btnStartOver = new JButton("Start Over");
+		
 		//String[] speedArr = {"0.1x", "0.25x", "0.5x", "1.0x", "2.0x"};
 		//String[] ruleArr = {"Keep Right", "Keep Left", "Keep Straight", "Random Direction", "Probability from data"};
 		
 		frmMazerunnerDisplayWindow = new JFrame();
 		frmMazerunnerDisplayWindow.setTitle("MazeRunner Display Window");
-		frmMazerunnerDisplayWindow.setBounds(100, 100, 1280, 720);
+		frmMazerunnerDisplayWindow.setBounds(80, 20, 1280, 720);
 		frmMazerunnerDisplayWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmMazerunnerDisplayWindow.setResizable(false);
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -93,13 +104,37 @@ public class RunnerWindow {
 		frmMazerunnerDisplayWindow.getContentPane().add(ctrlPanel, gbc_panel_1);
 		ctrlPanel.setLayout(new GridLayout(10, 0, 0, 0));
 		
-		JButton btnStartMazeRun = new JButton("Start Maze Run");
-		ctrlPanel.add(btnStartMazeRun);
+		btnStart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				btnStart.setEnabled(false);
+				btnStartOver.setEnabled(true);
+				btnPause.setEnabled(true);
+			}
+		});
+		ctrlPanel.add(btnStart);
 		
-		JButton btnPauseMazeRun = new JButton("Pause Maze Run");
-		ctrlPanel.add(btnPauseMazeRun);
+		btnPause.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(paused) {
+					btnPause.setText("Pause Maze Run");
+				}
+				else {
+					btnPause.setText("Unpause Maze Run");
+				}
+				paused = !paused;
+			}
+		});
+		ctrlPanel.add(btnPause);
 		
-		JButton btnStartOver = new JButton("Start Over");
+		btnStartOver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnStart.setEnabled(true);
+				btnStartOver.setEnabled(false);
+				paused = false;
+				btnPause.setText("Pause Maze Run");
+				btnPause.setEnabled(false);
+			}
+		});
 		ctrlPanel.add(btnStartOver);
 		
 		JLabel lblConsoleData = new JLabel("Console Data");
@@ -143,21 +178,56 @@ public class RunnerWindow {
 		gbc_consoleAI.gridy = 2;
 		frmMazerunnerDisplayWindow.getContentPane().add(jsp_consoleAI, gbc_consoleAI);
 		frmMazerunnerDisplayWindow.pack();
+		
+		JMenuBar menuBar = new JMenuBar();
+		frmMazerunnerDisplayWindow.setJMenuBar(menuBar);
+		
+		JMenu mnAgent = new JMenu("Agent");
+		menuBar.add(mnAgent);
+		
+		JMenuItem mntmLoadAgentData = new JMenuItem("Load Agent Data...");
+		mnAgent.add(mntmLoadAgentData);
+		
+		JMenuItem mntmClearAgentData = new JMenuItem("Clear Agent Data");
+		mnAgent.add(mntmClearAgentData);
+		
+		JMenu mnMaze = new JMenu("Maze");
+		menuBar.add(mnMaze);
+		
+		JMenuItem mntmLoadMaze = new JMenuItem("Load Maze...");
+		mnMaze.add(mntmLoadMaze);
+		
+		JMenuItem mntmGenerateMaze = new JMenuItem("Generate Maze...");
+		mnMaze.add(mntmGenerateMaze);
+		
+		JMenuItem mntmMazeOptions = new JMenuItem("Maze Options");
+		mnMaze.add(mntmMazeOptions);
+		
+		JMenuItem mntmEditMaze = new JMenuItem("Edit Maze");
+		mnMaze.add(mntmEditMaze);
 	}
 	
 	@SuppressWarnings("serial")
 	public static class RenderFrame extends JPanel{
+		final int GRID_CELL_SIZE = 20;
 		public RenderFrame() {
 			setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			setBackground(Color.WHITE);
 		}
 		public Dimension getPreferredSize() {
 			return new Dimension(960, 540);
 		}
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			
 			g.setColor(Color.BLACK);
-			g.drawString("Render here", 10, 20);
+			//g.drawString(Integer.toString(this.getWidth()), 10, 20);
+			//g.drawString(Integer.toString(this.getHeight()), 10, 40);
+			g.setColor(new Color(230, 230, 230));
+			for(int i = 0; i < this.getWidth() / GRID_CELL_SIZE; i ++) {
+				for(int j = 0; j < this.getHeight() / GRID_CELL_SIZE; j++) {
+					g.drawRect(i * GRID_CELL_SIZE, j * GRID_CELL_SIZE, GRID_CELL_SIZE, GRID_CELL_SIZE);
+				}
+			}
 		}
 	}
 }
