@@ -1,16 +1,34 @@
 package objects;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
+
 public class Cell {
-	int type;
+	int type, imgIndex;
 	boolean north, east, south, west;
+	BufferedImage tileset;
+	
 	public Cell() {
 		type = 0;
-		setBoolsFromInt();
+		init();
 	}
 	public Cell(int x) {
 		type = x;
-		setBoolsFromInt();
+		init();
 	}
+	public void init() {
+		setBoolsFromInt();
+		try {
+			tileset = ImageIO.read(new File("./.mazerunner/tileset.png"));
+		}
+		catch(Exception e){
+			
+		}
+		setImgIndex();
+	}
+	
 	/*
 	 * 1 = dead cell
 	 * 2 = north open
@@ -47,6 +65,7 @@ public class Cell {
 		if(type % 2 > 0) {
 			north = true;
 		}
+		setImgIndex();
 	}
 	public void setEast(boolean value) {
 		east = value;
@@ -64,6 +83,20 @@ public class Cell {
 		north = value;
 		setIntFromBools();
 	}
+	public void setImgIndex() {
+		if(north) {
+			imgIndex++;
+		}
+		if(south) {
+			imgIndex++;
+		}
+		if(east) {
+			imgIndex++;
+		}
+		if(west) {
+			imgIndex++;
+		}
+	}
 	public void setIntFromBools() {
 		type = 0;
 		if(east) {
@@ -78,6 +111,7 @@ public class Cell {
 		if(north) {
 			type++;
 		}
+		setImgIndex();
 	}
 	public void setType(int x){
 		type = x;
@@ -92,5 +126,9 @@ public class Cell {
 		System.out.println("South: " + south);
 		System.out.println("North: " + north);
 		System.out.println("Type Num: " + type);
+	}
+	public BufferedImage getImage() {
+		BufferedImage output = tileset.getSubimage(0, 64 * imgIndex, 64, 64);
+		return output;
 	}
 }

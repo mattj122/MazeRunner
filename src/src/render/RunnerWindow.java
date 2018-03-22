@@ -14,6 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 
+import objects.OutConsole;
+
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -59,13 +61,17 @@ public class RunnerWindow {
 	 */
 	private void initialize() {
 		JTextPane consoleData = new JTextPane();
+		OutConsole mainConsole = new OutConsole();
+		consoleData.setFont(new Font("Courier New", Font.PLAIN, 14));
 		consoleData.setEditable(false);
-		JTextPane consoleAI = new JTextPane();
-		consoleAI.setEditable(false);
+		JTextPane aIConsole = new JTextPane();
+		aIConsole.setEditable(false);
 		
 		JButton btnStart = new JButton("Start Maze Run");
 		JButton btnPause = new JButton("Pause Maze Run");
+		btnPause.setEnabled(false);
 		JButton btnStartOver = new JButton("Start Over");
+		btnStartOver.setEnabled(false);
 		
 		//String[] speedArr = {"0.1x", "0.25x", "0.5x", "1.0x", "2.0x"};
 		//String[] ruleArr = {"Keep Right", "Keep Left", "Keep Straight", "Random Direction", "Probability from data"};
@@ -109,6 +115,8 @@ public class RunnerWindow {
 				btnStart.setEnabled(false);
 				btnStartOver.setEnabled(true);
 				btnPause.setEnabled(true);
+				mainConsole.add("Starting maze run");
+				updateConsole(mainConsole, consoleData);
 			}
 		});
 		ctrlPanel.add(btnStart);
@@ -117,9 +125,13 @@ public class RunnerWindow {
 			public void actionPerformed(ActionEvent e) {
 				if(paused) {
 					btnPause.setText("Pause Maze Run");
+					mainConsole.add("Resuming");
+					updateConsole(mainConsole, consoleData);
 				}
 				else {
 					btnPause.setText("Unpause Maze Run");
+					mainConsole.add("Pausing");
+					updateConsole(mainConsole, consoleData);
 				}
 				paused = !paused;
 			}
@@ -133,11 +145,13 @@ public class RunnerWindow {
 				paused = false;
 				btnPause.setText("Pause Maze Run");
 				btnPause.setEnabled(false);
+				mainConsole.add("Starting over");
+				updateConsole(mainConsole, consoleData);
 			}
 		});
 		ctrlPanel.add(btnStartOver);
 		
-		JLabel lblConsoleData = new JLabel("Console Data");
+		JLabel lblConsoleData = new JLabel("Main Console");
 		lblConsoleData.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		GridBagConstraints gbc_lblConsoleData = new GridBagConstraints();
 		gbc_lblConsoleData.weighty = 1.0;
@@ -148,7 +162,7 @@ public class RunnerWindow {
 		gbc_lblConsoleData.gridy = 1;
 		frmMazerunnerDisplayWindow.getContentPane().add(lblConsoleData, gbc_lblConsoleData);
 		
-		JLabel lblNewLabel = new JLabel("Console AI");
+		JLabel lblNewLabel = new JLabel("AI Console");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 		gbc_lblNewLabel.weighty = 1.0;
@@ -169,7 +183,7 @@ public class RunnerWindow {
 		gbc_consoleData.gridy = 2;
 		frmMazerunnerDisplayWindow.getContentPane().add(jsp_consoleData, gbc_consoleData);
 		
-		JScrollPane jsp_consoleAI = new JScrollPane(consoleAI);
+		JScrollPane jsp_consoleAI = new JScrollPane(aIConsole);
 		GridBagConstraints gbc_consoleAI = new GridBagConstraints();
 		gbc_consoleAI.gridwidth = 2;
 		gbc_consoleAI.insets = new Insets(0, 2, 5, 5);
@@ -206,7 +220,9 @@ public class RunnerWindow {
 		JMenuItem mntmEditMaze = new JMenuItem("Edit Maze");
 		mnMaze.add(mntmEditMaze);
 	}
-	
+	public void updateConsole(OutConsole c, JTextPane out) {
+		out.setText(c.toString());
+	}
 	@SuppressWarnings("serial")
 	public static class RenderFrame extends JPanel{
 		final int GRID_CELL_SIZE = 20;
