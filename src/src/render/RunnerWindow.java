@@ -27,10 +27,11 @@ import java.awt.event.ActionEvent;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JComboBox;
 
 public class RunnerWindow {
 
-	private JFrame frmMazerunnerDisplayWindow;
+	private JFrame frmDisplayWindow;
 	public boolean paused = false;
 
 	/**
@@ -41,7 +42,7 @@ public class RunnerWindow {
 			public void run() {
 				try {
 					RunnerWindow window = new RunnerWindow();
-					window.frmMazerunnerDisplayWindow.setVisible(true);
+					window.frmDisplayWindow.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -67,30 +68,108 @@ public class RunnerWindow {
 		JTextPane aIConsole = new JTextPane();
 		aIConsole.setEditable(false);
 		
+		
+		//Button declarations
 		JButton btnStart = new JButton("Start Maze Run");
 		JButton btnPause = new JButton("Pause Maze Run");
-		btnPause.setEnabled(false);
 		JButton btnStartOver = new JButton("Start Over");
+		
+		//Button Initialization
 		btnStartOver.setEnabled(false);
+		btnPause.setEnabled(false);
 		
-		//String[] speedArr = {"0.1x", "0.25x", "0.5x", "1.0x", "2.0x"};
-		//String[] ruleArr = {"Keep Right", "Keep Left", "Keep Straight", "Random Direction", "Probability from data"};
+		//Menus
+		JMenuBar menuBar = new JMenuBar();
+		//Agent
+		JMenu mnAgent = new JMenu("Agent");
+		JMenuItem mntmLoadAgentData = new JMenuItem("Load Agent Data...");
+		JMenuItem mntmClearAgentData = new JMenuItem("Clear Agent Data");
+		//Maze
+		JMenu mnMaze = new JMenu("Maze");
+		JMenuItem mntmLoadMaze = new JMenuItem("Load Maze...");
+		JMenuItem mntmSaveMaze = new JMenuItem("Save Maze...");
+		JMenuItem mntmGenerateMaze = new JMenuItem("Generate Maze...");
+		JMenuItem mntmMazeOptions = new JMenuItem("Maze Options");
+		JMenuItem mntmEditMaze = new JMenuItem("Edit Maze");
 		
-		frmMazerunnerDisplayWindow = new JFrame();
-		frmMazerunnerDisplayWindow.setTitle("MazeRunner Display Window");
-		frmMazerunnerDisplayWindow.setBounds(80, 20, 1280, 720);
-		frmMazerunnerDisplayWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmMazerunnerDisplayWindow.setResizable(false);
+		//Menu Action Listeners
+		//Agent
+		mntmLoadAgentData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mainConsole.add("Load Agent Data Selected");
+				updateConsole(mainConsole, consoleData);
+			}
+		});
+		mntmClearAgentData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mainConsole.add("Clear Agent Data Selected");
+				updateConsole(mainConsole, consoleData);
+			}
+		});
+		//Maze
+		mntmLoadMaze.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mainConsole.add("Load Maze Data Selected");
+				updateConsole(mainConsole, consoleData);
+			}
+		});
+		mntmSaveMaze.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mainConsole.add("Save Maze Data Selected");
+				updateConsole(mainConsole, consoleData);
+			}
+		});
+		mntmGenerateMaze.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mainConsole.add("Generate Maze Selected");
+				updateConsole(mainConsole, consoleData);
+			}
+		});
+		mntmMazeOptions.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mainConsole.add("Maze Options Selected");
+				updateConsole(mainConsole, consoleData);
+			}
+		});
+		mntmEditMaze.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mainConsole.add("Edit Maze Selected");
+				updateConsole(mainConsole, consoleData);
+			}
+		});
+		
+		//Add Menu Items
+		menuBar.add(mnAgent);
+		mnAgent.add(mntmLoadAgentData);
+		mnAgent.add(mntmClearAgentData);
+		menuBar.add(mnMaze);
+		mnMaze.add(mntmLoadMaze);
+		mnMaze.add(mntmSaveMaze);
+		mnMaze.add(mntmGenerateMaze);
+		mnMaze.add(mntmMazeOptions);
+		mnMaze.add(mntmEditMaze);
+		
+		//Label declarations
+		JLabel lblNewLabel = new JLabel("AI Console");
+		
+		String[] speedArr = {"0.1x", "0.25x", "0.5x", "1.0x", "2.0x"};
+		String[] ruleArr = {"Keep Right", "Keep Left", "Keep Straight", "Random Direction", "Probability from data"};
+		
+		frmDisplayWindow = new JFrame();
+		frmDisplayWindow.setTitle("MazeRunner Display Window");
+		frmDisplayWindow.setBounds(80, 20, 1280, 720);
+		frmDisplayWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmDisplayWindow.setResizable(false);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] {640, 320, 320};
 		gridBagLayout.rowHeights = new int[] {480, 30, 210};
 		gridBagLayout.columnWeights = new double[]{1.0, 1.0, 1.0};
 		gridBagLayout.rowWeights = new double[]{1.0, 1.0, 1.0};
-		frmMazerunnerDisplayWindow.getContentPane().setLayout(gridBagLayout);
+		frmDisplayWindow.getContentPane().setLayout(gridBagLayout);
+		frmDisplayWindow.setJMenuBar(menuBar);
 		
 		
 		RenderFrame renderPanel = new RenderFrame();
-		//renderPanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.weighty = 1.0;
 		gbc_panel.weightx = 1.0;
@@ -99,7 +178,7 @@ public class RunnerWindow {
 		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.gridx = 0;
 		gbc_panel.gridy = 0;
-		frmMazerunnerDisplayWindow.getContentPane().add(renderPanel, gbc_panel);
+		frmDisplayWindow.getContentPane().add(renderPanel, gbc_panel);
 		
 		JPanel ctrlPanel = new JPanel();
 		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
@@ -107,7 +186,7 @@ public class RunnerWindow {
 		gbc_panel_1.fill = GridBagConstraints.BOTH;
 		gbc_panel_1.gridx = 2;
 		gbc_panel_1.gridy = 0;
-		frmMazerunnerDisplayWindow.getContentPane().add(ctrlPanel, gbc_panel_1);
+		frmDisplayWindow.getContentPane().add(ctrlPanel, gbc_panel_1);
 		ctrlPanel.setLayout(new GridLayout(10, 0, 0, 0));
 		
 		btnStart.addActionListener(new ActionListener() {
@@ -151,6 +230,12 @@ public class RunnerWindow {
 		});
 		ctrlPanel.add(btnStartOver);
 		
+		JComboBox comboBox = new JComboBox(speedArr);
+		ctrlPanel.add(comboBox);
+		
+		JComboBox comboBox_1 = new JComboBox(ruleArr);
+		ctrlPanel.add(comboBox_1);
+		
 		JLabel lblConsoleData = new JLabel("Main Console");
 		lblConsoleData.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		GridBagConstraints gbc_lblConsoleData = new GridBagConstraints();
@@ -160,9 +245,9 @@ public class RunnerWindow {
 		gbc_lblConsoleData.insets = new Insets(0, 0, 5, 5);
 		gbc_lblConsoleData.gridx = 0;
 		gbc_lblConsoleData.gridy = 1;
-		frmMazerunnerDisplayWindow.getContentPane().add(lblConsoleData, gbc_lblConsoleData);
+		frmDisplayWindow.getContentPane().add(lblConsoleData, gbc_lblConsoleData);
 		
-		JLabel lblNewLabel = new JLabel("AI Console");
+		//AI Label
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 		gbc_lblNewLabel.weighty = 1.0;
@@ -171,7 +256,7 @@ public class RunnerWindow {
 		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_lblNewLabel.gridx = 1;
 		gbc_lblNewLabel.gridy = 1;
-		frmMazerunnerDisplayWindow.getContentPane().add(lblNewLabel, gbc_lblNewLabel);
+		frmDisplayWindow.getContentPane().add(lblNewLabel, gbc_lblNewLabel);
 		
 		JScrollPane jsp_consoleData = new JScrollPane(consoleData);
 		GridBagConstraints gbc_consoleData = new GridBagConstraints();
@@ -181,7 +266,7 @@ public class RunnerWindow {
 		gbc_consoleData.fill = GridBagConstraints.BOTH;
 		gbc_consoleData.gridx = 0;
 		gbc_consoleData.gridy = 2;
-		frmMazerunnerDisplayWindow.getContentPane().add(jsp_consoleData, gbc_consoleData);
+		frmDisplayWindow.getContentPane().add(jsp_consoleData, gbc_consoleData);
 		
 		JScrollPane jsp_consoleAI = new JScrollPane(aIConsole);
 		GridBagConstraints gbc_consoleAI = new GridBagConstraints();
@@ -190,35 +275,8 @@ public class RunnerWindow {
 		gbc_consoleAI.fill = GridBagConstraints.BOTH;
 		gbc_consoleAI.gridx = 1;
 		gbc_consoleAI.gridy = 2;
-		frmMazerunnerDisplayWindow.getContentPane().add(jsp_consoleAI, gbc_consoleAI);
-		frmMazerunnerDisplayWindow.pack();
-		
-		JMenuBar menuBar = new JMenuBar();
-		frmMazerunnerDisplayWindow.setJMenuBar(menuBar);
-		
-		JMenu mnAgent = new JMenu("Agent");
-		menuBar.add(mnAgent);
-		
-		JMenuItem mntmLoadAgentData = new JMenuItem("Load Agent Data...");
-		mnAgent.add(mntmLoadAgentData);
-		
-		JMenuItem mntmClearAgentData = new JMenuItem("Clear Agent Data");
-		mnAgent.add(mntmClearAgentData);
-		
-		JMenu mnMaze = new JMenu("Maze");
-		menuBar.add(mnMaze);
-		
-		JMenuItem mntmLoadMaze = new JMenuItem("Load Maze...");
-		mnMaze.add(mntmLoadMaze);
-		
-		JMenuItem mntmGenerateMaze = new JMenuItem("Generate Maze...");
-		mnMaze.add(mntmGenerateMaze);
-		
-		JMenuItem mntmMazeOptions = new JMenuItem("Maze Options");
-		mnMaze.add(mntmMazeOptions);
-		
-		JMenuItem mntmEditMaze = new JMenuItem("Edit Maze");
-		mnMaze.add(mntmEditMaze);
+		frmDisplayWindow.getContentPane().add(jsp_consoleAI, gbc_consoleAI);
+		frmDisplayWindow.pack();
 	}
 	public void updateConsole(OutConsole c, JTextPane out) {
 		out.setText(c.toString());
@@ -238,10 +296,10 @@ public class RunnerWindow {
 			g.setColor(Color.BLACK);
 			//g.drawString(Integer.toString(this.getWidth()), 10, 20);
 			//g.drawString(Integer.toString(this.getHeight()), 10, 40);
-			g.setColor(new Color(230, 230, 230));
+			g.setColor(new Color(0, 0, 0));
 			for(int i = 0; i < this.getWidth() / GRID_CELL_SIZE; i ++) {
 				for(int j = 0; j < this.getHeight() / GRID_CELL_SIZE; j++) {
-					g.drawRect(i * GRID_CELL_SIZE, j * GRID_CELL_SIZE, GRID_CELL_SIZE, GRID_CELL_SIZE);
+					g.drawRect(i * GRID_CELL_SIZE, j * GRID_CELL_SIZE, 1, 1);
 				}
 			}
 		}

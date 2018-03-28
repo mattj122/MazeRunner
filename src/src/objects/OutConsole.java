@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import javax.swing.JOptionPane;
+
 public class OutConsole {
 	public static void main(String[] args) {
 		OutConsole n = new OutConsole();
@@ -43,7 +45,7 @@ public class OutConsole {
 				outFile.createNewFile();
 				System.out.println("File Created.");
 			} catch (Exception e) {
-				System.out.println(e.getMessage());
+				showError(e.getMessage());
 			}
 		}
 		try {
@@ -56,7 +58,7 @@ public class OutConsole {
 			out.close();
 		}
 		catch(Exception e) {
-			System.out.println(e.getMessage());
+			showError(e.getMessage());
 		}
 		mainList.clear();
 	}
@@ -69,4 +71,5 @@ public class OutConsole {
 		}
 		return output;
 	}
+	public static void showError(String str) {JOptionPane.showMessageDialog(null, str);}
 }

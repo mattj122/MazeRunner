@@ -43,12 +43,12 @@ public class DrawTest {
 		}
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			Color cellOutline = new Color(230, 230, 230);
+			Color cellOutline = new Color(100, 100, 100);
 			g.setColor(Color.BLACK);
 			g.setColor(cellOutline);
-			for(int i = 0; i < this.getWidth() / GRID_CELL_SIZE; i ++) {
-				for(int j = 0; j < this.getHeight() / GRID_CELL_SIZE; j++) {
-					g.drawRect(i * GRID_CELL_SIZE, j * GRID_CELL_SIZE, GRID_CELL_SIZE, GRID_CELL_SIZE);
+			for(int i = 0; i < (this.getWidth() / GRID_CELL_SIZE) + 1; i ++) {
+				for(int j = 0; j < (this.getHeight() / GRID_CELL_SIZE) + 1; j++) {
+					g.drawRect(i * GRID_CELL_SIZE, j * GRID_CELL_SIZE, 1, 1);
 				}
 			}
 			setDummyMaze(m);
@@ -58,7 +58,8 @@ public class DrawTest {
 					g.setColor(new Color(150, 150, 150));
 					g.drawImage(m.get(i, j).getImage(), ((i+2)*GRID_CELL_SIZE), ((j)*GRID_CELL_SIZE), (int)(64 * scale), (int)(64 * scale), this);
 					g.setColor(Color.WHITE);
-					g.drawString(Integer.toString(m.get(i, j-1).getType()), (i+2) * GRID_CELL_SIZE + 2, j * GRID_CELL_SIZE + 12);
+					g.drawString(Integer.toString(m.get(i, j-1).getType()), (i+2) * GRID_CELL_SIZE + 20, j * GRID_CELL_SIZE + 14);
+					g.drawString(Integer.toString(m.get(i, j-1).imgIndex), (i+2) * GRID_CELL_SIZE + 20, j * GRID_CELL_SIZE + 30);
 				}
 			}
 			
