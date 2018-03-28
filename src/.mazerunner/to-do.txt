@@ -1,0 +1,31 @@
+program: 
+-maze that shows correct image
+	-and also adds cells correctly
+	-rotate image
+-algorithm for generating
+-save and load maze data
+	-defaults
+-save and load ai data automatically
+-grid
+-draw path of agent
+-file browser??
+	-show list of mazes in maze_save folder
+-Action Listener Menu Options
+	-Load Maze
+		-File Browser
+	-Save Maze
+		-File Browser
+	-Generate Maze
+		-Options window for generating
+	-Edit Maze
+		-Edit specific part of the maze ??
+	-Maze Options ??
+	-Load Agent data
+		-File Browser
+		-Check if correct file type
+	-Save agent data
+		-File browser
+
+Agent: 
+-agent is able to read maze
+-agent can log paths and intersections
