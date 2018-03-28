@@ -1,5 +1,7 @@
 package objects;
 
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -14,6 +16,8 @@ public class Cell {
 	public boolean south;
 	public boolean west;
 	BufferedImage tileset;
+	BufferedImage tile;
+	public int rotFac;
 	
 	public Cell() {
 		type = 0;
@@ -32,6 +36,7 @@ public class Cell {
 			showError(e.getMessage());
 		}
 		setImgIndex();
+		setImage();
 	}
 	public static void showError(String str) {JOptionPane.showMessageDialog(null, str);}
 	/* Type values
@@ -102,6 +107,9 @@ public class Cell {
 		if(west) {
 			imgIndex++;
 		}
+		if((east && west && !north && !south) || (north && south && !east && !west)) {
+			imgIndex = 5;
+		}
 	}
 	public void setIntFromBools() {
 		type = 0;
@@ -134,9 +142,40 @@ public class Cell {
 		System.out.println("Type Num: " + type);
 	}
 	public BufferedImage getImage() {
+		return tile;
+	}
+	public void setImage() {
 		int x = 64 * imgIndex;
-		int rotFac = 0;
-		BufferedImage output = tileset.getSubimage(x, 0, 64, 64);
-		return output;
+		rotFac = 0;
+		tile = tileset.getSubimage(x, 0, 64, 64);
+		switch(type) {
+		case 2: rotFac = 270;
+		break;
+		case 3: rotFac = 270;
+		break;
+		case 4: rotFac = 180;
+		break;
+		case 6: rotFac = 180;
+		break;
+		case 7: rotFac = 180;
+		break;
+		case 8: rotFac = 90;
+		break;
+		case 10: rotFac = 90;
+		break;
+		case 11: rotFac = 270;
+		break;
+		case 12: rotFac = 90;
+		break;
+		case 14: rotFac = 90;
+		break;
+		}
+		rotate(rotFac);
+	}
+	public void rotate(int fac) {
+		AffineTransform at = new AffineTransform();
+		at.rotate(Math.toRadians(fac), tile.getWidth()/2, tile.getHeight()/2);
+		AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+		tile = op.filter(tile, null);
 	}
 }

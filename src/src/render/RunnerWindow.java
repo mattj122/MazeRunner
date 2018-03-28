@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 
+import objects.Maze;
 import objects.OutConsole;
 
 import java.awt.Font;
@@ -169,7 +170,7 @@ public class RunnerWindow {
 		frmDisplayWindow.setJMenuBar(menuBar);
 		
 		
-		RenderFrame renderPanel = new RenderFrame();
+		RenderPanel renderPanel = new RenderPanel(new Maze("dummy", "./.mazerunner/maze_save/"));
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.weighty = 1.0;
 		gbc_panel.weightx = 1.0;
@@ -280,28 +281,5 @@ public class RunnerWindow {
 	}
 	public void updateConsole(OutConsole c, JTextPane out) {
 		out.setText(c.toString());
-	}
-	@SuppressWarnings("serial")
-	public static class RenderFrame extends JPanel{
-		final int GRID_CELL_SIZE = 20;
-		public RenderFrame() {
-			setBorder(BorderFactory.createLineBorder(Color.BLACK));
-			setBackground(Color.WHITE);
-		}
-		public Dimension getPreferredSize() {
-			return new Dimension(960, 540);
-		}
-		public void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			g.setColor(Color.BLACK);
-			//g.drawString(Integer.toString(this.getWidth()), 10, 20);
-			//g.drawString(Integer.toString(this.getHeight()), 10, 40);
-			g.setColor(new Color(0, 0, 0));
-			for(int i = 0; i < this.getWidth() / GRID_CELL_SIZE; i ++) {
-				for(int j = 0; j < this.getHeight() / GRID_CELL_SIZE; j++) {
-					g.drawRect(i * GRID_CELL_SIZE, j * GRID_CELL_SIZE, 1, 1);
-				}
-			}
-		}
 	}
 }
