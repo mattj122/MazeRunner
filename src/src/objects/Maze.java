@@ -9,8 +9,7 @@ import javax.swing.JOptionPane;
 
 public class Maze {
 	Cell[][] mazeArray;
-	public int width;
-	public int height;
+	public int width, height, startPos, endPos;
 	private static String dir = "./.mazerunner/maze_save/";
 	private static String fileName = "dummy";
 	public static void main(String [] args) throws Exception {
@@ -21,6 +20,8 @@ public class Maze {
 	public Maze(int x, int y) {
 		width = x;
 		height = y;
+		startPos = 0;
+		endPos = 0;
 		mazeArray = new Cell [width][height];
 		for(int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
@@ -31,8 +32,8 @@ public class Maze {
 	public Maze(String fileName, String address) {
 		try {
 			loadMaze(fileName, address);
-		} catch (IOException e) {
-			showError("File Not Found");
+		} catch (Exception e) {
+			showError(e.getMessage());
 		}
 		printMazeValues();
 	}
@@ -54,25 +55,40 @@ public class Maze {
 		}
 		mazeProp.setProperty("width", Integer.toString(width));
 		mazeProp.setProperty("height", Integer.toString(height));
+		mazeProp.setProperty("start", Integer.toString(startPos));
+		mazeProp.setProperty("end", Integer.toString(endPos));
 		outStream = new FileOutputStream(out);
 		mazeProp.store(outStream, "Data for " + width + " x " + height + " maze.");
 		outStream.close();
 		mazeProp.list(System.out);
 		
 	}
-	public void loadMaze(String fileName, String address) throws IOException {
+	public void generateMaze() {
+		
+	}
+	public void loadMaze(String fileName, String address) throws Exception {
 		Properties mazeProp = new Properties();
 		FileInputStream inStream = new FileInputStream(address + "\\" + fileName + ".ini");
 		mazeProp.load(inStream);
 		inStream.close();
-		width = Integer.parseInt(mazeProp.getProperty("width"));
-		height = Integer.parseInt(mazeProp.getProperty("height"));
-		mazeArray = new Cell [width][height];
-		for(int i = width-1; i >= 0; i--) {
-			for(int j = height-1; j >= 0; j--) {
-				mazeArray[i][j] = new Cell(Integer.parseInt(mazeProp.getProperty(Integer.toString(i) + "-" + Integer.toString(j), "0")));
+		String fileType = mazeProp.getProperty("type");
+		if(!(fileType.substring(0, 1).equalsIgnoreCase("m"))) {
+			mazeProp.clear();
+			throw new Exception("Error: type fault, clearing properties");
+		}
+		else {
+			width = Integer.parseInt(mazeProp.getProperty("width"));
+			height = Integer.parseInt(mazeProp.getProperty("height"));
+			startPos = Integer.parseInt(mazeProp.getProperty("start"));
+			endPos = Integer.parseInt(mazeProp.getProperty("end"));
+			mazeArray = new Cell [width][height];
+			for(int i = width-1; i >= 0; i--) {
+				for(int j = height-1; j >= 0; j--) {
+					mazeArray[i][j] = new Cell(Integer.parseInt(mazeProp.getProperty(Integer.toString(i) + "-" + Integer.toString(j), "0")));
+				}
 			}
 		}
+		
 	}
 	public void showError(String str) {JOptionPane.showMessageDialog(null, str);}
 	/* Type values
@@ -93,6 +109,7 @@ public class Maze {
 	 * 14= east south west open
 	 * 15= all open
 	 */
+	//Needs work
 	public void setCell(int x, int y, int type) throws Exception {
 		if(type > 15 || x > width || y > height || x < 0 || y < 0){
 			throw new Exception("Invalid input value(s)");
@@ -144,6 +161,7 @@ public class Maze {
 	 * 3 = West
 	 * 4 = North
 	 */
+	//Needs work
 	public void openDirection(int x, int y, int dir) {
 		
 	}
@@ -158,8 +176,11 @@ public class Maze {
 				}
 				System.out.println();
 			}
+			System.out.println("start = " + startPos);
+			System.out.println("end = " + endPos);
 		}
 	}
+	//Needs work
 	public void closeDirection(int x, int y, int dir) throws Exception {
 		switch(dir) {
 		case 1: mazeArray[x][y].setEast(false);
