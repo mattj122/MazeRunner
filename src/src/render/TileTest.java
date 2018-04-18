@@ -11,6 +11,7 @@ import javax.swing.SwingUtilities;
 
 import objects.Cell;
 import objects.Maze;
+import objects.OutConsole;
 
 public class TileTest {
 
@@ -23,7 +24,8 @@ public class TileTest {
 			private void createAndShowGUI() {
 				JFrame f = new JFrame();
 				Maze m = dummyMaze();
-				RenderPanel rPanel = new RenderPanel(m);
+				Agent ai = new Agent(m, new OutConsole());
+				RenderPanel rPanel = new RenderPanel(m, ai);
 				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				f.getContentPane().add(rPanel);
 				f.setTitle("Debugging Rendering");
@@ -49,7 +51,7 @@ public class TileTest {
 				}
 			}
 			private Maze dummyMaze() {
-				return new Maze("dummy", "./.mazerunner/maze_save/");
+				return new Maze("tileset", "./.mazerunner/maze_save/");
 			}
 		});
 	}

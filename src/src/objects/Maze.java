@@ -198,4 +198,7 @@ public class Maze {
 		}
 		
 	}
+	public Cell CellAt(int xPos, int yPos) {
+		return mazeArray[xPos][yPos];
+	}
 }

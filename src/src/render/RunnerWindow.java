@@ -34,6 +34,8 @@ public class RunnerWindow {
 
 	private JFrame frmDisplayWindow;
 	public boolean paused = false;
+	public int startX, startY;
+	private String fileName = "dummy";
 
 	/**
 	 * Launch the application.
@@ -67,13 +69,21 @@ public class RunnerWindow {
 		consoleData.setFont(new Font("Courier New", Font.PLAIN, 14));
 		consoleData.setEditable(false);
 		JTextPane aIConsole = new JTextPane();
+		OutConsole aIMainConsole = new OutConsole();
+		aIConsole.setFont(new Font("Courier New", Font.PLAIN, 14));
 		aIConsole.setEditable(false);
 		
+		Maze maze = new Maze(fileName, "./.mazerunner/maze_save/");
+		Agent ai = new Agent(maze, aIMainConsole);
 		
 		//Button declarations
 		JButton btnStart = new JButton("Start Maze Run");
 		JButton btnPause = new JButton("Pause Maze Run");
 		JButton btnStartOver = new JButton("Start Over");
+		JButton moveRt = new JButton("Move agent right");
+		JButton moveUp = new JButton("Move agent up");
+		JButton moveDn = new JButton("Move agent down");
+		JButton moveLt = new JButton("Move agent left");
 		
 		//Button Initialization
 		btnStartOver.setEnabled(false);
@@ -170,7 +180,9 @@ public class RunnerWindow {
 		frmDisplayWindow.setJMenuBar(menuBar);
 		
 		
-		RenderPanel renderPanel = new RenderPanel(new Maze("dummy", "./.mazerunner/maze_save/"));
+		RenderPanel renderPanel = new RenderPanel(maze, ai);
+		startX = renderPanel.mazeStartX - 1;
+		startY = renderPanel.mazeStartY + renderPanel.getMaze().startPos;
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.weighty = 1.0;
 		gbc_panel.weightx = 1.0;
@@ -236,6 +248,55 @@ public class RunnerWindow {
 		
 		JComboBox comboBox_1 = new JComboBox(ruleArr);
 		ctrlPanel.add(comboBox_1);
+		
+		moveRt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					ai.move(1);
+				} catch (Exception e) {
+					aIMainConsole.add(e.getMessage());
+				}
+				updateConsole(ai.getCons(), aIConsole);
+				renderPanel.update();
+			}
+		});
+		moveUp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					ai.move(2);
+				} catch (Exception e) {
+					aIMainConsole.add(e.getMessage());
+				}
+				updateConsole(ai.getCons(), aIConsole);
+				renderPanel.update();
+			}
+		});
+		moveDn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					ai.move(4);
+				} catch (Exception e) {
+					aIMainConsole.add(e.getMessage());
+				}
+				updateConsole(ai.getCons(), aIConsole);
+				renderPanel.update();
+			}
+		});
+		moveLt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					ai.move(3);
+				} catch (Exception e) {
+					aIMainConsole.add(e.getMessage());
+				}
+				updateConsole(ai.getCons(), aIConsole);
+				renderPanel.update();
+			}
+		});
+		ctrlPanel.add(moveRt);
+		ctrlPanel.add(moveUp);
+		ctrlPanel.add(moveDn);
+		ctrlPanel.add(moveLt);
 		
 		JLabel lblConsoleData = new JLabel("Main Console");
 		lblConsoleData.setFont(new Font("Tahoma", Font.PLAIN, 12));
