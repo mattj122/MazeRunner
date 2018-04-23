@@ -12,10 +12,13 @@ public class Agent {
 	private Maze m;
 	private ArrayList<Dimension> intersect;
 	private boolean atStart = true, finished = false;
+	private boolean vpNorth = false, vpSouth = false, vpWest = false, vpEast = true;
 	private List intersList;
+	private int prior = 0;
+	private Cell cur;
 	private OutConsole console;
 	public Agent(Maze inMaze, OutConsole aiConsole) {
-		m = inMaze;
+		m = new Maze(inMaze.getFilename(), inMaze.getFileDir());
 		console = aiConsole;
 		xPos = -1;
 		yPos = m.startPos;
@@ -62,94 +65,61 @@ public class Agent {
 			console.add("Moving agent 1 space down. ");
 		break;
 		}
+		prior = dir;
 		if(!finished || !atStart) {
 			checkCell();
 		}
 	}
-	private void checkMovements(int dir) throws Exception {
+	private boolean checkMovements(int dir) throws Exception {
 		Cell cur = new Cell(m.get(xPos, yPos).getType());
+		boolean out = false;
 		Exception e2 = new Exception("Cannot go out of bounds of the maze");
-		Exception e = new Exception("Not a viable direction to move. ");
-		if(dir == 1 && !cur.east) {
-			throw e;
+		if(xPos == 0 && dir == 3) {
+			throw e2;
 		}
-		if(dir == 2 && !cur.north) {
-			throw e;
+		else if(yPos == 0 && dir == 2) {
+			throw e2;
 		}
-		if(dir == 3 && !cur.west) {
-			throw e;
-		}
-		if(dir == 4 && !cur.south) {
-			throw e;
-		}
-		if(!atStart) {
-			if(xPos == 0 && dir == 3) {
+		else if(xPos == (m.width-1) && dir == 1) {
+			if(yPos == m.endPos) {
+				finished = true;
+			}
+			else {
 				throw e2;
 			}
-			if(yPos == 0 && dir == 2) {
-				throw e2;
-			}
-			if(xPos == (m.width-1) && dir == 1) {
-				if(yPos == m.endPos) {
-					finished = true;
-				}
-				else {
-					throw e2;
-				}
-			}
-			if(yPos == (m.height-1) && dir == 4) {
-				throw e2;
-			}
+		}
+		else if(yPos == (m.height-1) && dir == 4) {
+			throw e2;
 		}
 		else {
-			if(dir != 1) {
-				throw new Exception("Can only go right. ");
-			}
+			out = true;
 		}
+		return out;
 	}
 	public void checkCell() throws Exception {
 		if(finished) {
 			console.add("Maze Completed. ");
 		}
+		cur = new Cell(m.CellAt(xPos, yPos).getType());
 		boolean inters = false;
 		int x = -1, y = -1;
-		Cell cur = new Cell(m.CellAt(xPos, yPos).getType());
 		//If a cell is a power of 2, it is a dead end
-		switch(cur.getType()) {
-		case 1: //Dead-End
+		switch(cur.pathNum) {
+		case 1:
 			deadEnd();
 		break;
-		case 2: //Dead-End
-			deadEnd();
+		case 2: //Proceed to next viable direction
+			int movement = 1;
+			while((movement == prior) || !(checkMovements(movement))) {
+				movement++;
+			}
+			move(movement);
 		break;
-		case 4: //Dead-End
-			deadEnd();
-		break;
-		case 7: //Intersection
-			console.add("Intersection discovered.");
+		case 3: //Intersection to log
 			inters = true;
 		break;
-		case 8: //Dead-End
-			deadEnd();
-		break;
-		case 11: //Intersection
-			console.add("Intersection discovered.");
+		case 4:	//Intersection to log
 			inters = true;
-		break;
-		case 13: //Intersection
-			console.add("Intersection discovered.");
-			inters = true;
-		break;
-		case 14: //Intersection
-			console.add("Intersection discovered.");
-			inters = true;
-		break;
-		case 15: //Intersection
-			console.add("Intersection discovered.");
-			inters = true;
-		break;
-		//All others are paths that are not dead-ends or intersections
-		default: //Go along path
 		break;
 		}
 		if(inters == true) {
@@ -165,6 +135,11 @@ public class Agent {
 		}
 		else {
 			throw new Exception("No possible outlets. ");
+		}
+		cur = m.get(xPos, yPos);
+		if(cur.pathNum == 1) {
+			intersect.remove(intersect.size()-1);
+			deadEnd();
 		}
 		console.add("Returning to intersection at position (" + xPos + ", " + yPos + "). ");
 	}

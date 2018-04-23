@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 
 public class Cell {
 	int type;
-	public int imgIndex;
+	public int imgIndex, pathNum = 0;
 	public boolean north;
 	public boolean east;
 	public boolean south;
@@ -65,15 +65,19 @@ public class Cell {
 		
 		if((type / 8) % 2 > 0) {
 			east = true;
+			pathNum++;
 		}
 		if((type / 4) % 2 > 0) {
 			south = true;
+			pathNum++;
 		}
 		if((type / 2) % 2 > 0) {
 			west = true;
+			pathNum++;
 		}
 		if(type % 2 > 0) {
 			north = true;
+			pathNum++;
 		}
 		setImgIndex();
 	}

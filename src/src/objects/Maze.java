@@ -35,7 +35,14 @@ public class Maze {
 		} catch (Exception e) {
 			showError(e.getMessage());
 		}
-		printMazeValues();
+		printMazeValues(true);
+		//printMazeValues(false);
+	}
+	public String getFilename() {
+		return fileName;
+	}
+	public String getFileDir() {
+		return dir;
 	}
 	public Cell get(int x, int y) {
 		return mazeArray[x][y];
@@ -165,14 +172,20 @@ public class Maze {
 	public void openDirection(int x, int y, int dir) {
 		
 	}
-	public void printMazeValues() {
+	public void printMazeValues(boolean b) {
+		boolean mazeVal = b;
 		if(width == 0){
 			showError("Unable to print null array");
 		}
 		else{
 			for(int i = 0; i < height; i++) {
 				for(int j = 0; j < width; j++) {
-					System.out.print(mazeArray[j][i].getType() + "\t");
+					if(mazeVal) {
+						System.out.print(mazeArray[j][i].getType() + "\t");
+					}
+					else {
+						System.out.print(mazeArray[j][i].pathNum + "\t");
+					}
 				}
 				System.out.println();
 			}
