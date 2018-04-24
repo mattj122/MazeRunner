@@ -1,4 +1,4 @@
-package render;
+package ignore;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import objects.Cell;
 import objects.Maze;
 import objects.OutConsole;
+//import render.List;
 
 public class Agent {
 	int xPos, yPos;
@@ -13,7 +14,7 @@ public class Agent {
 	private ArrayList<Dimension> intersect;
 	private boolean atStart = true, finished = false;
 	private boolean vpNorth = false, vpSouth = false, vpWest = false, vpEast = true;
-	private List intersList;
+	//private List intersList;
 	private int prior = 0;
 	private Cell cur;
 	private OutConsole console;
@@ -65,7 +66,7 @@ public class Agent {
 			console.add("Moving agent 1 space down. ");
 		break;
 		}
-		prior = dir;
+		
 		if(!finished || !atStart) {
 			checkCell();
 		}

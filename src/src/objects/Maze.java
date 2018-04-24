@@ -2,7 +2,6 @@ package objects;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Properties;
 
 import javax.swing.JOptionPane;
@@ -11,12 +10,7 @@ public class Maze {
 	Cell[][] mazeArray;
 	public int width, height, startPos, endPos;
 	private static String dir = "./.mazerunner/maze_save/";
-	private static String fileName = "dummy";
-	public static void main(String [] args) throws Exception {
-		//Maze m = new Maze(5, 3);
-		//m.saveMaze();
-		Maze m = new Maze(fileName, dir);
-	}
+	private static String fileName;
 	public Maze(int x, int y) {
 		width = x;
 		height = y;
@@ -30,12 +24,13 @@ public class Maze {
 		}
 	}
 	public Maze(String fileName, String address) {
+		this.fileName = fileName;
 		try {
 			loadMaze(fileName, address);
 		} catch (Exception e) {
 			showError(e.getMessage());
 		}
-		printMazeValues(true);
+		//printMazeValues(true);
 		//printMazeValues(false);
 	}
 	public String getFilename() {
@@ -95,7 +90,6 @@ public class Maze {
 				}
 			}
 		}
-		
 	}
 	public void showError(String str) {JOptionPane.showMessageDialog(null, str);}
 	/* Type values

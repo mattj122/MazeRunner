@@ -1,41 +1,38 @@
 package render;
 
-import javax.swing.JFrame;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.Color;
-import java.awt.Dimension;
-
-import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 
 import objects.Maze;
 import objects.OutConsole;
 
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JComboBox;
-
 public class RunnerWindow {
 
 	private JFrame frmDisplayWindow;
 	public boolean paused = false;
 	public int startX, startY;
-	private String fileName = "dummy";
+	private String fileName = "dummy_2";
+	static JTextPane consoleData = new JTextPane();
+	static OutConsole mainConsole = new OutConsole();
+	static JTextPane aIConsole = new JTextPane();
+	static Agent ai;
 
 	/**
 	 * Launch the application.
@@ -64,17 +61,14 @@ public class RunnerWindow {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		JTextPane consoleData = new JTextPane();
-		OutConsole mainConsole = new OutConsole();
 		consoleData.setFont(new Font("Courier New", Font.PLAIN, 14));
 		consoleData.setEditable(false);
-		JTextPane aIConsole = new JTextPane();
-		OutConsole aIMainConsole = new OutConsole();
 		aIConsole.setFont(new Font("Courier New", Font.PLAIN, 14));
 		aIConsole.setEditable(false);
 		
 		Maze maze = new Maze(fileName, "./.mazerunner/maze_save/");
-		Agent ai = new Agent(maze, aIMainConsole);
+		RenderPanel renderPanel = new RenderPanel(maze);
+		ai = renderPanel.getAI();
 		
 		//Button declarations
 		JButton btnStart = new JButton("Start Maze Run");
@@ -108,44 +102,44 @@ public class RunnerWindow {
 		mntmLoadAgentData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mainConsole.add("Load Agent Data Selected");
-				updateConsole(mainConsole, consoleData);
+				updateConsoles();
 			}
 		});
 		mntmClearAgentData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mainConsole.add("Clear Agent Data Selected");
-				updateConsole(mainConsole, consoleData);
+				updateConsoles();
 			}
 		});
 		//Maze
 		mntmLoadMaze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mainConsole.add("Load Maze Data Selected");
-				updateConsole(mainConsole, consoleData);
+				updateConsoles();
 			}
 		});
 		mntmSaveMaze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mainConsole.add("Save Maze Data Selected");
-				updateConsole(mainConsole, consoleData);
+				updateConsoles();
 			}
 		});
 		mntmGenerateMaze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mainConsole.add("Generate Maze Selected");
-				updateConsole(mainConsole, consoleData);
+				updateConsoles();
 			}
 		});
 		mntmMazeOptions.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mainConsole.add("Maze Options Selected");
-				updateConsole(mainConsole, consoleData);
+				updateConsoles();
 			}
 		});
 		mntmEditMaze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mainConsole.add("Edit Maze Selected");
-				updateConsole(mainConsole, consoleData);
+				updateConsoles();
 			}
 		});
 		
@@ -168,7 +162,7 @@ public class RunnerWindow {
 		
 		frmDisplayWindow = new JFrame();
 		frmDisplayWindow.setTitle("MazeRunner Display Window");
-		frmDisplayWindow.setBounds(80, 20, 1280, 720);
+		frmDisplayWindow.setBounds(10, 10, 960, 540);
 		frmDisplayWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmDisplayWindow.setResizable(false);
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -180,7 +174,6 @@ public class RunnerWindow {
 		frmDisplayWindow.setJMenuBar(menuBar);
 		
 		
-		RenderPanel renderPanel = new RenderPanel(maze, ai);
 		startX = renderPanel.mazeStartX - 1;
 		startY = renderPanel.mazeStartY + renderPanel.getMaze().startPos;
 		GridBagConstraints gbc_panel = new GridBagConstraints();
@@ -208,7 +201,7 @@ public class RunnerWindow {
 				btnStartOver.setEnabled(true);
 				btnPause.setEnabled(true);
 				mainConsole.add("Starting maze run");
-				updateConsole(mainConsole, consoleData);
+				updateConsoles();
 			}
 		});
 		ctrlPanel.add(btnStart);
@@ -218,12 +211,12 @@ public class RunnerWindow {
 				if(paused) {
 					btnPause.setText("Pause Maze Run");
 					mainConsole.add("Resuming");
-					updateConsole(mainConsole, consoleData);
+					updateConsoles();
 				}
 				else {
 					btnPause.setText("Unpause Maze Run");
 					mainConsole.add("Pausing");
-					updateConsole(mainConsole, consoleData);
+					updateConsoles();
 				}
 				paused = !paused;
 			}
@@ -238,7 +231,7 @@ public class RunnerWindow {
 				btnPause.setText("Pause Maze Run");
 				btnPause.setEnabled(false);
 				mainConsole.add("Starting over");
-				updateConsole(mainConsole, consoleData);
+				updateConsoles();
 			}
 		});
 		ctrlPanel.add(btnStartOver);
@@ -254,31 +247,31 @@ public class RunnerWindow {
 				try {
 					ai.move(1);
 				} catch (Exception e) {
-					aIMainConsole.add(e.getMessage());
+					ai.log(e.getMessage());
 				}
-				updateConsole(ai.getCons(), aIConsole);
+				//updateConsoles();
 				renderPanel.update();
 			}
 		});
 		moveUp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					ai.move(2);
+					ai.move(4);
 				} catch (Exception e) {
-					aIMainConsole.add(e.getMessage());
+					ai.log(e.getMessage());
 				}
-				updateConsole(ai.getCons(), aIConsole);
+				//updateConsoles();
 				renderPanel.update();
 			}
 		});
 		moveDn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					ai.move(4);
+					ai.move(2);
 				} catch (Exception e) {
-					aIMainConsole.add(e.getMessage());
+					ai.log(e.getMessage());
 				}
-				updateConsole(ai.getCons(), aIConsole);
+				//updateConsoles();
 				renderPanel.update();
 			}
 		});
@@ -287,9 +280,9 @@ public class RunnerWindow {
 				try {
 					ai.move(3);
 				} catch (Exception e) {
-					aIMainConsole.add(e.getMessage());
+					ai.log(e.getMessage());
 				}
-				updateConsole(ai.getCons(), aIConsole);
+				//updateConsoles();
 				renderPanel.update();
 			}
 		});
@@ -340,7 +333,8 @@ public class RunnerWindow {
 		frmDisplayWindow.getContentPane().add(jsp_consoleAI, gbc_consoleAI);
 		frmDisplayWindow.pack();
 	}
-	public void updateConsole(OutConsole c, JTextPane out) {
-		out.setText(c.toString());
+	public static void updateConsoles() {
+		consoleData.setText(mainConsole.toString());
+		aIConsole.setText(ai.getCons().toString());
 	}
 }

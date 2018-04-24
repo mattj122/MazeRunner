@@ -1,0 +1,2 @@
+#Data for 30x50 maze.
+#Tue Mar 27 18:48:03 CDT 2018

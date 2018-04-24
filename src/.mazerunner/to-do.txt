@@ -1,8 +1,4 @@
 program: 
--maze that shows correct image
-	-and also adds cells correctly
-	-rotate image
--algorithm for generating
 -save and load maze data
 	-defaults
 -save and load ai data automatically
@@ -15,11 +11,6 @@ program:
 		-File Browser
 	-Save Maze
 		-File Browser
-	-Generate Maze
-		-Options window for generating
-	-Edit Maze
-		-Edit specific part of the maze ??
-	-Maze Options ??
 	-Load Agent data
 		-File Browser
 		-Check if correct file type
@@ -29,3 +20,18 @@ program:
 Agent: 
 -agent is able to read maze
 -agent can log paths and intersections
+
+-Dead-Ends
+-Save agent data
+
+Testing:
+-Load different mazes
+-Load AI data
+-Running works
+-Pausing works
+-Starting over works
+-AI agent successfully passes at least 3 mazes and is able to log the data
+-upon dead ends, return to previous intersection and deem that path unviable
+-coming across 2 dead ends from a T, that intersection becomes a dead-end
+-altering time speed factor
+-altering rules

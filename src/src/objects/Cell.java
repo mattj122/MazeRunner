@@ -18,6 +18,7 @@ public class Cell {
 	BufferedImage tileset;
 	BufferedImage tile;
 	public int rotFac;
+	private int prior = 0;
 	
 	public Cell() {
 		type = 0;
@@ -38,6 +39,8 @@ public class Cell {
 		setImgIndex();
 		setImage();
 	}
+	public void setPrior(int i) {prior = i;System.out.println("Prior:" + prior);}
+	public int getPrior() {return prior;}
 	public static void showError(String str) {JOptionPane.showMessageDialog(null, str);}
 	/* Type values
 	 * 0 = dead cell
@@ -80,6 +83,44 @@ public class Cell {
 			pathNum++;
 		}
 		setImgIndex();
+	}
+	//1 = east
+	//2 = south
+	//3 = west
+	//4 = north
+	public void setDir(int i, boolean b) {
+		switch(i) {
+		case 1:
+			setEast(b);
+		break;
+		case 2:
+			setSouth(b);
+		break;
+		case 3:
+			setWest(b);
+		break;
+		case 4:
+			setNorth(b);
+		break;
+		}
+	}
+	public boolean getDirBool(int i) {
+		boolean out = false;
+		switch(i) {
+		case 1:
+			out = east;
+		break;
+		case 2:
+			out = south;
+		break;
+		case 3:
+			out = west;
+		break;
+		case 4:
+			out = north;
+		break;
+		}
+		return out;
 	}
 	public void setEast(boolean value) {
 		east = value;
