@@ -1,5 +1,6 @@
 package render;
 
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -7,6 +8,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -25,145 +27,50 @@ import objects.OutConsole;
 
 public class RunnerWindow {
 
-	private JFrame frmDisplayWindow;
+	protected JFrame frmDisplayWindow;
 	public boolean paused = false;
 	public int startX, startY;
-	private String fileName = "dummy_2";
+	private String fileName, fileDir;
 	static JTextPane consoleData = new JTextPane();
 	static OutConsole mainConsole = new OutConsole();
 	static JTextPane aIConsole = new JTextPane();
 	static Agent ai;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					RunnerWindow window = new RunnerWindow();
-					window.frmDisplayWindow.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the application.
 	 */
-	public RunnerWindow() {
-		initialize();
+	public RunnerWindow(File f) {
+		fileDir = ".\\.mazerunner\\" + f.getParentFile().getName();
+		fileName = f.getName();
+		initialize(f);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize(File f) {
 		consoleData.setFont(new Font("Courier New", Font.PLAIN, 14));
 		consoleData.setEditable(false);
 		aIConsole.setFont(new Font("Courier New", Font.PLAIN, 14));
 		aIConsole.setEditable(false);
 		
-		Maze maze = new Maze(fileName, "./.mazerunner/maze_save/");
+		Maze maze = new Maze(fileName, fileDir);
 		RenderPanel renderPanel = new RenderPanel(maze);
 		ai = renderPanel.getAI();
 		
 		//Button declarations
 		JButton btnStart = new JButton("Start Maze Run");
-		JButton btnPause = new JButton("Pause Maze Run");
-		JButton btnStartOver = new JButton("Start Over");
-		JButton moveRt = new JButton("Move agent right");
-		JButton moveUp = new JButton("Move agent up");
-		JButton moveDn = new JButton("Move agent down");
-		JButton moveLt = new JButton("Move agent left");
-		
-		//Button Initialization
-		btnStartOver.setEnabled(false);
-		btnPause.setEnabled(false);
-		
-		//Menus
-		JMenuBar menuBar = new JMenuBar();
-		//Agent
-		JMenu mnAgent = new JMenu("Agent");
-		JMenuItem mntmLoadAgentData = new JMenuItem("Load Agent Data...");
-		JMenuItem mntmClearAgentData = new JMenuItem("Clear Agent Data");
-		//Maze
-		JMenu mnMaze = new JMenu("Maze");
-		JMenuItem mntmLoadMaze = new JMenuItem("Load Maze...");
-		JMenuItem mntmSaveMaze = new JMenuItem("Save Maze...");
-		JMenuItem mntmGenerateMaze = new JMenuItem("Generate Maze...");
-		JMenuItem mntmMazeOptions = new JMenuItem("Maze Options");
-		JMenuItem mntmEditMaze = new JMenuItem("Edit Maze");
-		
-		//Menu Action Listeners
-		//Agent
-		mntmLoadAgentData.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mainConsole.add("Load Agent Data Selected");
-				updateConsoles();
-			}
-		});
-		mntmClearAgentData.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mainConsole.add("Clear Agent Data Selected");
-				updateConsoles();
-			}
-		});
-		//Maze
-		mntmLoadMaze.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mainConsole.add("Load Maze Data Selected");
-				updateConsoles();
-			}
-		});
-		mntmSaveMaze.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mainConsole.add("Save Maze Data Selected");
-				updateConsoles();
-			}
-		});
-		mntmGenerateMaze.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mainConsole.add("Generate Maze Selected");
-				updateConsoles();
-			}
-		});
-		mntmMazeOptions.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mainConsole.add("Maze Options Selected");
-				updateConsoles();
-			}
-		});
-		mntmEditMaze.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mainConsole.add("Edit Maze Selected");
-				updateConsoles();
-			}
-		});
-		
-		//Add Menu Items
-		menuBar.add(mnAgent);
-		mnAgent.add(mntmLoadAgentData);
-		mnAgent.add(mntmClearAgentData);
-		menuBar.add(mnMaze);
-		mnMaze.add(mntmLoadMaze);
-		mnMaze.add(mntmSaveMaze);
-		mnMaze.add(mntmGenerateMaze);
-		mnMaze.add(mntmMazeOptions);
-		mnMaze.add(mntmEditMaze);
 		
 		//Label declarations
 		JLabel lblNewLabel = new JLabel("AI Console");
 		
-		String[] speedArr = {"0.1x", "0.25x", "0.5x", "1.0x", "2.0x"};
-		String[] ruleArr = {"Keep Right", "Keep Left", "Keep Straight", "Random Direction", "Probability from data"};
+		String[] speedArr = {"0.1x", "0.25x", "0.5x", "1.0x", "2x", "5x", "Instant"};
+		String[] ruleArr = {"Probability from data", "Random Direction"};
 		
 		frmDisplayWindow = new JFrame();
 		frmDisplayWindow.setTitle("MazeRunner Display Window");
 		frmDisplayWindow.setBounds(10, 10, 960, 540);
-		frmDisplayWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmDisplayWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frmDisplayWindow.setResizable(false);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] {640, 320, 320};
@@ -171,7 +78,6 @@ public class RunnerWindow {
 		gridBagLayout.columnWeights = new double[]{1.0, 1.0, 1.0};
 		gridBagLayout.rowWeights = new double[]{1.0, 1.0, 1.0};
 		frmDisplayWindow.getContentPane().setLayout(gridBagLayout);
-		frmDisplayWindow.setJMenuBar(menuBar);
 		
 		
 		startX = renderPanel.mazeStartX - 1;
@@ -198,98 +104,83 @@ public class RunnerWindow {
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				btnStart.setEnabled(false);
-				btnStartOver.setEnabled(true);
-				btnPause.setEnabled(true);
 				mainConsole.add("Starting maze run");
-				updateConsoles();
-			}
-		});
-		ctrlPanel.add(btnStart);
-		
-		btnPause.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(paused) {
-					btnPause.setText("Pause Maze Run");
-					mainConsole.add("Resuming");
-					updateConsoles();
-				}
-				else {
-					btnPause.setText("Unpause Maze Run");
-					mainConsole.add("Pausing");
-					updateConsoles();
-				}
-				paused = !paused;
-			}
-		});
-		ctrlPanel.add(btnPause);
-		
-		btnStartOver.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				btnStart.setEnabled(true);
-				btnStartOver.setEnabled(false);
-				paused = false;
-				btnPause.setText("Pause Maze Run");
-				btnPause.setEnabled(false);
-				mainConsole.add("Starting over");
-				updateConsoles();
-			}
-		});
-		ctrlPanel.add(btnStartOver);
-		
-		JComboBox comboBox = new JComboBox(speedArr);
-		ctrlPanel.add(comboBox);
-		
-		JComboBox comboBox_1 = new JComboBox(ruleArr);
-		ctrlPanel.add(comboBox_1);
-		
-		moveRt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
 				try {
 					ai.move(1);
 				} catch (Exception e) {
 					ai.log(e.getMessage());
 				}
-				//updateConsoles();
-				renderPanel.update();
-			}
-		});
-		moveUp.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					ai.move(4);
-				} catch (Exception e) {
-					ai.log(e.getMessage());
+				if(ai.finished) {
+					mainConsole.add("Maze Completed. ");
 				}
-				//updateConsoles();
 				renderPanel.update();
+				updateConsoles();
 			}
 		});
-		moveDn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					ai.move(2);
-				} catch (Exception e) {
-					ai.log(e.getMessage());
+		ctrlPanel.add(btnStart);
+		
+		JComboBox speedCombo = new JComboBox(speedArr);
+		speedCombo.setSelectedIndex(5);
+		setSpeed((String)(speedCombo.getSelectedItem()));
+		speedCombo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(speedCombo.getSelectedIndex() == 6) {
+					mainConsole.add("Setting speed to instant. ");
+					ai.updateDelayFactor(0);
+					updateConsoles();
 				}
-				//updateConsoles();
-				renderPanel.update();
-			}
-		});
-		moveLt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					ai.move(3);
-				} catch (Exception e) {
-					ai.log(e.getMessage());
+				else {
+					setSpeed((String)(speedCombo.getSelectedItem()));
 				}
-				//updateConsoles();
-				renderPanel.update();
 			}
 		});
-		ctrlPanel.add(moveRt);
-		ctrlPanel.add(moveUp);
-		ctrlPanel.add(moveDn);
-		ctrlPanel.add(moveLt);
+		
+		JButton btnStartOver = new JButton("Start Over");
+		btnStartOver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							RunnerWindow window = new RunnerWindow(f);
+							window.frmDisplayWindow.setVisible(true);
+							frmDisplayWindow.dispose();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		});
+		ctrlPanel.add(btnStartOver);
+		
+		JButton btnSelectADifferent = new JButton("Select a different Maze");
+		btnSelectADifferent.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							StartPopup window = new StartPopup();
+							window.frame.setVisible(true);
+							frmDisplayWindow.dispose();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		});
+		ctrlPanel.add(btnSelectADifferent);
+		ctrlPanel.add(speedCombo);
+		
+		JComboBox ruleCombo = new JComboBox(ruleArr);
+		ruleCombo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mainConsole.add("Setting rule to " + ruleCombo.getSelectedItem());
+				ai.setRule(ruleCombo.getSelectedIndex() + 1);
+				updateConsoles();
+			}
+		});
+		ctrlPanel.add(ruleCombo);
 		
 		JLabel lblConsoleData = new JLabel("Main Console");
 		lblConsoleData.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -332,6 +223,12 @@ public class RunnerWindow {
 		gbc_consoleAI.gridy = 2;
 		frmDisplayWindow.getContentPane().add(jsp_consoleAI, gbc_consoleAI);
 		frmDisplayWindow.pack();
+	}
+	public void setSpeed (String str) {
+		double fac = 1.0 / Double.parseDouble(str.substring(0, str.indexOf("x")));
+		mainConsole.add("Setting speed to " + str + ". ");
+		ai.updateDelayFactor(fac);
+		updateConsoles();
 	}
 	public static void updateConsoles() {
 		consoleData.setText(mainConsole.toString());

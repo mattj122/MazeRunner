@@ -36,7 +36,7 @@ public class RenderPanel extends JPanel{
 	}
 	public RenderPanel(Maze inMaze) {
 		m = inMaze;
-		a = new Agent(inMaze, new OutConsole(), this);
+		a = new Agent(inMaze, this);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		setBackground(Color.WHITE);
 	}
@@ -122,7 +122,8 @@ class Agent {
 	public OutConsole console;
 	private ArrayList<Dimension> intLog;
 	private ArrayList<Integer> curPath;
-	private boolean atStart = true, finished = false;
+	private boolean atStart = true;
+	protected boolean finished = false;
 	private int prior;
 	private ArrayList<Integer> logSuccesses = new ArrayList<Integer>();
 	private RenderPanel rp;
@@ -131,11 +132,14 @@ class Agent {
 	private int[] probValues;
 	private boolean dataSaved = false;
 	private boolean[] viable = new boolean[4];
-	private String probFileName = "agent_data", probFileDir = "./.mazerunner/";
+	String probFileName = "agent_data", probFileDir = ".\\.mazerunner";
+	//1 for use data
+	//2 for random direction
+	private int rule = 1;
 	
-	public Agent(Maze inMaze, OutConsole aiConsole, RenderPanel renderP) {
+	public Agent(Maze inMaze, RenderPanel renderP) {
 		m = new Maze(inMaze.getFilename(), inMaze.getFileDir());
-		console = aiConsole;
+		console = new OutConsole();
 		x = -1;
 		y = m.startPos;
 		rp = renderP;
@@ -144,14 +148,24 @@ class Agent {
 		try {
 			loadProb();
 		} catch (Exception e) {
-			showError(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	public void setRule(int i) {
+		if(i > 0 && i < 3) {
+			rule = i;
+		}
+		else {
+			showError("Incorrect input number, must be '1' or '2'");
 		}
 	}
 	public void showError(String str) {JOptionPane.showMessageDialog(null, str);}
 	private void loadProb() throws Exception {
+		log("Loading agent data from " + probFileDir + "\\" + probFileName + ".ini");
 		prob = new double [4];
 		probValues = new int[8];
 		Properties probData = new Properties();
+		System.out.println(probFileDir + "\\" + probFileName + ".ini");
 		FileInputStream inStream = new FileInputStream(probFileDir + "\\" + probFileName + ".ini");
 		probData.load(inStream);
 		inStream.close();
@@ -161,24 +175,28 @@ class Agent {
 			throw new Exception("Error: type fault, clearing properties");
 		}
 		else {
-			probValues[0] = Integer.parseInt(probData.getProperty("timesEast", "1"));
-			probValues[1] = Integer.parseInt(probData.getProperty("successEast", "1"));
-			probValues[2] = Integer.parseInt(probData.getProperty("timesSouth", "1"));
-			probValues[3] = Integer.parseInt(probData.getProperty("successSouth", "1"));
-			probValues[4] = Integer.parseInt(probData.getProperty("timesWest", "1"));
-			probValues[5] = Integer.parseInt(probData.getProperty("successWest", "1"));
-			probValues[6] = Integer.parseInt(probData.getProperty("timesNorth", "1"));
-			probValues[7] = Integer.parseInt(probData.getProperty("successNorth", "1"));
+			probValues[0] = Integer.parseInt(probData.getProperty("timesEast"));
+			probValues[1] = Integer.parseInt(probData.getProperty("successEast"));
+			probValues[2] = Integer.parseInt(probData.getProperty("timesSouth"));
+			probValues[3] = Integer.parseInt(probData.getProperty("successSouth"));
+			probValues[4] = Integer.parseInt(probData.getProperty("timesWest"));
+			probValues[5] = Integer.parseInt(probData.getProperty("successWest"));
+			probValues[6] = Integer.parseInt(probData.getProperty("timesNorth"));
+			probValues[7] = Integer.parseInt(probData.getProperty("successNorth"));
 		}
-		
 		//Calculate probability values
 		for(int i = 0; i < 4; i++) {
 			prob[i] = (double)(probValues[(i * 2) + 1]) / (double)(probValues[(i * 2)]);
-		}		
+			//System.out.println(prob[i]);
+		}
+		for(int i = 0; i < 8; i++) {
+			//System.out.println(probValues[i]);
+		}
+		log("Data loaded. ");
 	}
 	public void log(String str) {
 		console.add(str);
-		RunnerWindow.updateConsoles();
+		//RunnerWindow.updateConsoles();
 	}
 	private void checkCell() {
 		RunnerWindow.updateConsoles();
@@ -187,7 +205,7 @@ class Agent {
 			if(!dataSaved) {
 				try {
 					saveLogData();
-				} catch (IOException e) {
+				} catch (Exception e) {
 					showError(e.getMessage());
 				}
 				dataSaved = true;
@@ -197,48 +215,56 @@ class Agent {
 			updateCur();
 			switch(cur.pathNum) {
 			case 1: //Only 1 path means a dead-end
+				log("Dead-end. ");
 				deadEnd();
 			break;
 			case 2: //2 paths means the agent can only continue along the tube
 				tube();
 			break;
 			case 3:	//3 paths means coming to a T - log as an intersection
+				log("Logging intersection at position (" + x + ", " + y + "). ");
 				intersection();
 			break;
 			case 4: //4 paths means coming to a 4 way cross - log as an intersection
+				log("Logging intersection at position (" + x + ", " + y + "). ");
 				intersection();
 			break;
 			}
 		}
 	}
 	private void saveLogData() throws IOException {
+		log("Saving agent log data... ");
 		FileOutputStream outStream;
 		String out = probFileDir + "\\" + probFileName + ".ini";
-		Properties mazeProp = new Properties();
+		Properties probProp = new Properties();
 		
 		for(int i = 0; i < logSuccesses.size(); i++) {
 			probValues[(logSuccesses.get(i) * 2) - 1]++;
 		}
 		
-		mazeProp.setProperty("timesEast", Integer.toString(probValues[0]));
-		mazeProp.setProperty("successesEast", Integer.toString(probValues[1]));
-		mazeProp.setProperty("timesSouth", Integer.toString(probValues[2]));
-		mazeProp.setProperty("successesSouth", Integer.toString(probValues[3]));
-		mazeProp.setProperty("timesWest", Integer.toString(probValues[4]));
-		mazeProp.setProperty("successesWest", Integer.toString(probValues[5]));
-		mazeProp.setProperty("timesNorth", Integer.toString(probValues[6]));
-		mazeProp.setProperty("successesNorth", Integer.toString(probValues[7]));
+		probProp.setProperty("timesEast", Integer.toString(probValues[0]));
+		probProp.setProperty("successEast", Integer.toString(probValues[1]));
+		probProp.setProperty("timesSouth", Integer.toString(probValues[2]));
+		probProp.setProperty("successSouth", Integer.toString(probValues[3]));
+		probProp.setProperty("timesWest", Integer.toString(probValues[4]));
+		probProp.setProperty("successWest", Integer.toString(probValues[5]));
+		probProp.setProperty("timesNorth", Integer.toString(probValues[6]));
+		probProp.setProperty("successNorth", Integer.toString(probValues[7]));
+		
+		probProp.setProperty("type", "a");
 
 		outStream = new FileOutputStream(out);
-		mazeProp.store(outStream, "Data for agent for probability calculation. ");
+		probProp.store(outStream, "Data for agent for probability calculation. ");
 		outStream.close();
-		mazeProp.list(System.out);
+		log("Data saved under " + probFileDir + "\\" + probFileName + ".ini");
 	}
 	private void intersection() {
 		RunnerWindow.updateConsoles();
 		intLog.add(new Dimension(x, y));
-		console.add("Logging intersection at position (" + x + ", " + y + "). ");
 		//updateCur();
+		if(rule == 2) {
+			prob = new double[] {.25, .25, .25, .25};
+		}
 		double [] normProb  = new double[4];
 		double sum = 0;
 		for(int i = 0; i < 4; i++) {
@@ -252,36 +278,36 @@ class Agent {
 				normProb[i] = prob[i] / sum;
 			}
 		}
-		for(int i = 0; i < normProb.length; i++) {
-			System.out.println(normProb[i]);
-		}
 		int move = 1;
 		double choice = Math.random();
-		System.out.println(choice);
 		if(choice <= normProb[0]) {
-			System.out.println("Choose East. ");
 			move = 1;
 		}
-		else if(choice <= normProb[0] + normProb[1]) {
-			System.out.println("Choose South. ");
+		else if(choice <= normProb[1] + normProb[0]) {
 			move = 2;
 		}
-		else if(choice <= normProb[0] + normProb[1] + normProb[2]) {
-			System.out.println("Choose West. ");
+		else if(choice <= normProb[2] + normProb[1] + normProb[0]) {
 			move = 3;
 		}
 		else {
-			System.out.println("Choose North. ");
 			move = 4;
 		}
+		//Log the current path
 		curPath.add(move);
+		//Increment each "times" of direction to be saved later for a total of attempts
+		probValues[(move - 1) * 2]++;
+		//Log every move into successes, remove if the path leads to a dead-end. 
 		logSuccesses.add(move);
+		//Move in that direction
 		move(move);
 	}
-	//1 = east
-	//2 = south
-	//3 = west
-	//4 = north
+	/*
+	 * If a move is valid, move the agent in that direction, else print "Invalid Move"
+	 * 1 = east
+	 * 2 = south
+	 * 3 = west
+	 * 4 = north
+	 * */
 	public void move(int dir) {
 		RunnerWindow.updateConsoles();
 		delay();
@@ -290,10 +316,10 @@ class Agent {
 		}
 		else {
 			switch(dir) {
-			case 1: //Go Right
+			case 1: //Go Right/East
 				if(atStart || cur.east){
 					x++;
-					log("Moving agent 1 space to the right. ");
+					log("Moving right. ");
 					if(atStart) {
 						atStart = false;
 						log("Leaving starting position. ");
@@ -303,28 +329,28 @@ class Agent {
 					log("Invalid move. ");
 				}
 			break;
-			case 2: //Go Down
+			case 2: //Go Down/South
 				if(cur.south) {
 					y++;
-					log("Moving agent 1 space down. ");
+					log("Moving down. ");
 				}
 				else if(atStart || !cur.south){
 					log("Invalid move. ");
 				}
 			break;
-			case 3: //Go Left 
+			case 3: //Go Left/West
 				if(cur.west && x != 0) {
 					x--;
-					log("Moving agent 1 space to the left. ");
+					log("Moving left. ");
 				}
 				else if(atStart || !cur.west){
 					log("Invalid move. ");
 				}
 			break;
-			case 4: //Go Up
+			case 4: //Go Up/North
 				if(cur.north) {
 					y--;
-					log("Moving agent 1 space up. ");
+					log("Moving up. ");
 				}
 				else if(atStart || !cur.north){
 					log("Invalid move. ");
@@ -345,19 +371,12 @@ class Agent {
 			}
 			checkCell();
 		}
-		probValues[(dir - 1) * 2]++;
 	}
 	private void tube() {
 		RunnerWindow.updateConsoles();
 		//updateCur();
-		int dir = 1; 
-		for(int i = 1; i <= 4; i++) {
-			if(i != cur.getPrior() && cur.getDirBool(i)) {
-				dir = i;
-			}
-		}
 		try {
-			move(dir);
+			move(tubeMove());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -365,22 +384,29 @@ class Agent {
 	}
 	private void deadEnd() {
 		if(!finished) {
-			log("Dead-end. ");
 			if(!(intLog.isEmpty())) {
 				delay();
 				x = intLog.get(intLog.size()-1).width;
 				y = intLog.get(intLog.size()-1).height;
-				logSuccesses.remove(logSuccesses.size()-1);
-				m.get(x, y).setDir(curPath.get(curPath.size()-1), false);
+				if(!curPath.isEmpty()) {
+					m.get(x, y).setDir(curPath.get(curPath.size()-1), false);
+				}
 				updateCur();
-				intLog.remove(intLog.size()-1);
-				curPath.remove(curPath.size()-1);
+				if(!logSuccesses.isEmpty()) {
+					//System.out.println("removing " + logSuccesses.get(logSuccesses.size()-1) + " from log of successes. ");
+					logSuccesses.remove(logSuccesses.size()-1);
+				}
 				cur.pathNum--;
 				if(cur.pathNum == 1) {
+					intLog.remove(intLog.size()-1);
 					deadEnd();
 				}
 				else {
+					curPath.remove(curPath.size()-1);
 					log("Returning to intersection at position (" + x + ", " + y + "). ");
+					if(cur.pathNum == 2) {
+						logSuccesses.add(tubeMove());
+					}
 					checkCell();
 				}
 				
@@ -389,6 +415,15 @@ class Agent {
 				log("No possible outlets. ");
 			}
 		}
+	}
+	private Integer tubeMove() {
+		int dir = 1; 
+		for(int i = 1; i <= 4; i++) {
+			if(i != cur.getPrior() && cur.getDirBool(i)) {
+				dir = i;
+			}
+		}
+		return dir;
 	}
 	public OutConsole getCons() {
 		return console;

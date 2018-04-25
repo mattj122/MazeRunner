@@ -39,7 +39,7 @@ public class Cell {
 		setImgIndex();
 		setImage();
 	}
-	public void setPrior(int i) {prior = i;System.out.println("Prior:" + prior);}
+	public void setPrior(int i) {prior = i;}
 	public int getPrior() {return prior;}
 	public static void showError(String str) {JOptionPane.showMessageDialog(null, str);}
 	/* Type values

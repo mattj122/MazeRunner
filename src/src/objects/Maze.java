@@ -70,7 +70,7 @@ public class Maze {
 	}
 	public void loadMaze(String fileName, String address) throws Exception {
 		Properties mazeProp = new Properties();
-		FileInputStream inStream = new FileInputStream(address + "\\" + fileName + ".ini");
+		FileInputStream inStream = new FileInputStream(address + "\\" + fileName);
 		mazeProp.load(inStream);
 		inStream.close();
 		String fileType = mazeProp.getProperty("type");
