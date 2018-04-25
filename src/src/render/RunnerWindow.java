@@ -14,9 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -48,6 +45,7 @@ public class RunnerWindow {
 	/**
 	 * Initialize the contents of the frame.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void initialize(File f) {
 		consoleData.setFont(new Font("Courier New", Font.PLAIN, 14));
 		consoleData.setEditable(false);
@@ -60,6 +58,7 @@ public class RunnerWindow {
 		
 		//Button declarations
 		JButton btnStart = new JButton("Start Maze Run");
+		JButton btnStartOver = new JButton("Start Over");
 		
 		//Label declarations
 		JLabel lblNewLabel = new JLabel("AI Console");
@@ -113,6 +112,7 @@ public class RunnerWindow {
 				if(ai.finished) {
 					mainConsole.add("Maze Completed. ");
 				}
+				btnStartOver.setEnabled(true);
 				renderPanel.update();
 				updateConsoles();
 			}
@@ -135,7 +135,8 @@ public class RunnerWindow {
 			}
 		});
 		
-		JButton btnStartOver = new JButton("Start Over");
+		
+		btnStartOver.setEnabled(false);
 		btnStartOver.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SwingUtilities.invokeLater(new Runnable() {

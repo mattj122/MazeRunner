@@ -60,6 +60,9 @@ public class RenderPanel extends JPanel{
 		m.generateMaze();
 	}
 	public void paintComponent(Graphics g) {
+		cellSize = 2;
+		cellSize = Math.min((widthRes / (m.width + 2)), (heightRes / (m.height + 2)));
+		System.out.println(cellSize);
 		super.paintComponent(g);
 		//Render grid
 		for(int i = 0; i < grid.length; i ++) {
@@ -165,7 +168,6 @@ class Agent {
 		prob = new double [4];
 		probValues = new int[8];
 		Properties probData = new Properties();
-		System.out.println(probFileDir + "\\" + probFileName + ".ini");
 		FileInputStream inStream = new FileInputStream(probFileDir + "\\" + probFileName + ".ini");
 		probData.load(inStream);
 		inStream.close();
@@ -262,20 +264,28 @@ class Agent {
 		RunnerWindow.updateConsoles();
 		intLog.add(new Dimension(x, y));
 		//updateCur();
-		if(rule == 2) {
-			prob = new double[] {.25, .25, .25, .25};
-		}
 		double [] normProb  = new double[4];
 		double sum = 0;
 		for(int i = 0; i < 4; i++) {
 			if(viable[i] && i != (cur.getPrior() - 1)) {
-				sum += prob[i];
+				if(rule == 2) {
+					sum += 1;
+				}
+				else {
+					sum += prob[i];
+				}
 			}
 		}
 		for(int i = 0; i < normProb.length; i++) {
 			normProb[i] = 0.0;
 			if(viable[i] && i != (cur.getPrior() - 1)) {
-				normProb[i] = prob[i] / sum;
+				if(rule == 2) {
+					normProb[i] = 1.0 / sum;
+					System.out.println(normProb[i]);
+				}
+				else {
+					normProb[i] = prob[i] / sum;
+				}
 			}
 		}
 		int move = 1;

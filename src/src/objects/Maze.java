@@ -10,7 +10,7 @@ public class Maze {
 	Cell[][] mazeArray;
 	public int width, height, startPos, endPos;
 	private static String dir = "./.mazerunner/maze_save/";
-	private static String fileName;
+	private String fileName;
 	public Maze(int x, int y) {
 		width = x;
 		height = y;
